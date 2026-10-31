@@ -11,13 +11,13 @@ let tasks = [
         id: 2,
         title: "Загрузить черновик в гитхаб",
         date: "2026-10-31",
-        completed: false
+        completed: true
     },
     {
         id: 3,
         title: "Сделать перенос элементов",
         date: "2026-10-31",
-        completed: false
+        completed: true
     },
     {
         id: 4,
@@ -36,10 +36,28 @@ let tasks = [
         title: "Загрузить финальный вариант в гитхаб",
         date: "2026-10-31",
         completed: false
+    },
+    {
+        id: 7,
+        title: "Разобраться с pages в гитхабе",
+        date: "2026-10-31",
+        completed: true
+    },
+    {
+        id: 8,
+        title: "Сделать сохранение списка задач",
+        date: "2026-10-31",
+        completed: false
+    },
+    {
+        id: 9,
+        title: "Загрузить рабочую версию в гитхаб",
+        date: "2026-10-31",
+        completed: false
     }
 ];
 
-let next_task_id = 3;
+let next_task_id = 8;
 
 
 
@@ -173,9 +191,12 @@ function renderTasks() {
 
     if (sort_select.value === "desc") { visible_tasks.sort((a, b) => b.date.localeCompare(a.date)); }
 
-    // 3.1 Items
+    // 3.2 Items
     visible_tasks.forEach(task => {
         const task_item = document.createElement("li");
+
+        task_item.draggable = sort_select.value === "manual";
+        task_item.dataset.id = task.id;
 
         const task_info = document.createElement("div");
 
@@ -217,6 +238,44 @@ function formatDate(dateString) {
     const [year, month, day] = dateString.split("-");
     return `${day}.${month}.${year}`;
 }
+
+let dragged_task_id = null;
+
+task_list.addEventListener("dragstart", event => {
+    const task_item = event.target.closest("li");
+
+    dragged_task_id = Number(task_item.dataset.id);
+});
+
+task_list.addEventListener("dragover", event => {
+    const task_item = event.target.closest("li");
+
+    if (task_item) {
+        event.preventDefault();
+    }
+});
+
+task_list.addEventListener("drop", event => {
+    event.preventDefault();
+
+    const target_item = event.target.closest("li");
+
+    const target_id = Number(target_item.dataset.id);
+
+    const from_index = tasks.findIndex(task => task.id === dragged_task_id);
+
+    const [moved_task] = tasks.splice(from_index, 1);
+
+    const target_index = tasks.findIndex(task => task.id === target_id);
+
+    tasks.splice(target_index, 0, moved_task);
+
+    renderTasks();
+});
+
+task_list.addEventListener("dragend", () => {
+    dragged_task_id = null;
+});
 
 
 
