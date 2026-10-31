@@ -1,63 +1,68 @@
 ﻿// 0. Test data
 
-let tasks = [
-    {
-        id: 1,
-        title: "Сделать черновик сайта",
-        date: "2026-10-30",
-        completed: true
-    },
-    {
-        id: 2,
-        title: "Загрузить черновик в гитхаб",
-        date: "2026-10-31",
-        completed: true
-    },
-    {
-        id: 3,
-        title: "Сделать перенос элементов",
-        date: "2026-10-31",
-        completed: true
-    },
-    {
-        id: 4,
-        title: "Загрузить рабочий вариант в гитхаб",
-        date: "2026-10-31",
-        completed: false
-    },
-    {
-        id: 5,
-        title: "Добавить графики через css",
-        date: "2026-10-31",
-        completed: false
-    },
-    {
-        id: 6,
-        title: "Загрузить финальный вариант в гитхаб",
-        date: "2026-10-31",
-        completed: false
-    },
-    {
-        id: 7,
-        title: "Разобраться с pages в гитхабе",
-        date: "2026-10-31",
-        completed: true
-    },
-    {
-        id: 8,
-        title: "Сделать сохранение списка задач",
-        date: "2026-10-31",
-        completed: false
-    },
-    {
-        id: 9,
-        title: "Загрузить рабочую версию в гитхаб",
-        date: "2026-10-31",
-        completed: false
-    }
-];
+const saved_tasks = localStorage.getItem("todo_tasks");
 
-let next_task_id = 8;
+let tasks = saved_tasks !== null
+    ? JSON.parse(saved_tasks)
+    : [
+        {
+            id: 1,
+            title: "Сделать черновик сайта",
+            date: "2026-10-30",
+            completed: true
+        },
+        {
+            id: 2,
+            title: "Загрузить черновик в гитхаб",
+            date: "2026-10-31",
+            completed: true
+        },
+        {
+            id: 3,
+            title: "Сделать перенос элементов",
+            date: "2026-10-31",
+            completed: true
+        },
+        {
+            id: 4,
+            title: "Загрузить рабочий вариант в гитхаб",
+            date: "2026-10-31",
+            completed: true
+        },
+        {
+            id: 5,
+            title: "Добавить графики через css",
+            date: "2026-10-31",
+            completed: false
+        },
+        {
+            id: 6,
+            title: "Загрузить финальный вариант в гитхаб",
+            date: "2026-10-31",
+            completed: false
+        },
+        {
+            id: 7,
+            title: "Разобраться с pages в гитхабе",
+            date: "2026-10-31",
+            completed: true
+        },
+        {
+            id: 8,
+            title: "Сделать сохранение списка задач",
+            date: "2026-10-31",
+            completed: true
+        },
+        {
+            id: 9,
+            title: "Загрузить рабочую версию в гитхаб",
+            date: "2026-10-31",
+            completed: false
+        }
+    ]
+    if (saved_tasks === null) { saveTasks(); };
+
+let next_task_id = Math.max(0, ...tasks.map(task => task.id)) + 1;
 
 
 
@@ -161,6 +166,7 @@ task_form.addEventListener("submit", event => {
     tasks.push(new_task);
 
     task_form.reset();
+    saveTasks();
     renderTasks();
 });
 
@@ -195,7 +201,7 @@ function renderTasks() {
     visible_tasks.forEach(task => {
         const task_item = document.createElement("li");
 
-        task_item.draggable = sort_select.value === "manual";
+        task_item.draggable = sort_select.value === "manual" && status_filter.value === "all" && search_input.value === "";
         task_item.dataset.id = task.id;
 
         const task_info = document.createElement("div");
@@ -204,21 +210,60 @@ function renderTasks() {
         checkbox.type = "checkbox";
         checkbox.checked = task.completed;
 
+        if (task.completed) { task_item.classList.add("completed"); }
+
+        checkbox.addEventListener("change", () => {
+            task.completed = checkbox.checked;
+            saveTasks();
+            renderTasks();
+        });
+
         const title = document.createElement("span");
         title.textContent = task.title;
+
+        task_info.append(checkbox, title);
 
         const date = document.createElement("time");
         date.textContent = task.date ? formatDate(task.date) : "Без срока";
         if (task.date) date.dateTime = task.date;
 
-        if (task.completed) { task_item.classList.add("completed"); }
+        const edit_button = document.createElement("button");
+        edit_button.type = "button";
+        edit_button.textContent = "Редактировать";
 
-        checkbox.addEventListener("change", () => {
-            task.completed = checkbox.checked;
-            renderTasks();
+        edit_button.addEventListener("click", () => {
+            const edit_title = document.createElement("input");
+            edit_title.type = "text";
+            edit_title.value = task.title;
+            edit_title.required = true;
+
+            const edit_date = document.createElement("input");
+            edit_date.type = "date";
+            edit_date.value = task.date;
+
+            const save_button = document.createElement("button");
+            save_button.type = "submit";
+            save_button.textContent = "Сохранить";
+
+            const edit_form = document.createElement("form");
+
+            edit_form.append(edit_title, edit_date, save_button);
+
+            task_item.replaceChildren(edit_form);
+
+            edit_form.addEventListener("submit", event => {
+                event.preventDefault();
+
+                const new_title = edit_title.value;
+                if (!new_title) return;
+
+                task.title = new_title;
+                task.date = edit_date.value;
+
+                saveTasks();
+                renderTasks();
+            });
         });
-
-        task_info.append(checkbox, title);
 
         const delete_button = document.createElement("button");
         delete_button.type = "button";
@@ -226,10 +271,11 @@ function renderTasks() {
 
         delete_button.addEventListener("click", () => {
             tasks = tasks.filter(item => item.id !== task.id);
+            saveTasks();
             renderTasks();
         });
 
-        task_item.append(task_info, date, delete_button);
+        task_item.append(task_info, date, edit_button, delete_button);
         task_list.append(task_item);
     });
 }
@@ -261,6 +307,7 @@ task_list.addEventListener("drop", event => {
     const target_item = event.target.closest("li");
 
     const target_id = Number(target_item.dataset.id);
+    if (dragged_task_id === target_id) return;
 
     const from_index = tasks.findIndex(task => task.id === dragged_task_id);
 
@@ -270,12 +317,17 @@ task_list.addEventListener("drop", event => {
 
     tasks.splice(target_index, 0, moved_task);
 
+    saveTasks();
     renderTasks();
 });
 
 task_list.addEventListener("dragend", () => {
     dragged_task_id = null;
 });
+
+function saveTasks() {
+    localStorage.setItem("todo_tasks", JSON.stringify(tasks));
+}
 
 
 

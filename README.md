@@ -1,10 +1,4 @@
-# Web (still filling up)
+Please choose your language / Пожалуйста, выберите язык:
 
-A repository about web.
-
-## Сайты
-
-Список лабораторных работ.
-* [Лабораторная работа №1](Lab1/)
-* [Лабораторная работа №2](Lab2/)
-
+* [English Documentation](README.en.md)
+* [Документация на русском](README.ru.md)
