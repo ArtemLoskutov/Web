@@ -12,8 +12,8 @@
 
 Список лабораторных работ:
 
-* [Лабораторная работа №1](../Lab1/)
-* [Лабораторная работа №2](../Lab2/)
+* [Лабораторная работа №1](Lab1/)
+* [Лабораторная работа №2](Lab2/)
 
 ---
 
@@ -25,6 +25,5 @@ Repositories for Web Programming laboratory course.
 
 List of websites:
 
-* [Laboratory work №1](../Lab1/)
-* [Laboratory work №2](../Lab2/)
-
+* [Laboratory work №1](Lab1/)
+* [Laboratory work №2](Lab2/)

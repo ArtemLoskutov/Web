@@ -75,10 +75,7 @@ const header = document.createElement("header");
 const heading = document.createElement("h1");
 heading.textContent = "ToDo List";
 
-const section_name = document.createElement("h2");
-section_name.textContent = "Добавить задачу";
-
-header.append(heading, section_name);
+header.append(heading);
 
 // 1.2 Main
 
@@ -108,6 +105,7 @@ task_form.append(form_label, date_input, add_button);
 // 1.2.2 Toolbar
 
 const toolbar = document.createElement("section");
+toolbar.classList.add("toolbar");
 
 const search_input = document.createElement("input");
 search_input.type = "search";
@@ -145,6 +143,7 @@ sort_select.addEventListener("change", renderTasks);
 // 1.2.3 Tasks
 
 const task_section = document.createElement("section");
+task_section.classList.add("task-list");
 
 const section_heading = document.createElement("h2");
 section_heading.textContent = "Список задач";
