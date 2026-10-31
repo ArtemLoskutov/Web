@@ -1,4 +1,10 @@
-﻿// 0. Test data
+﻿const stylesheet = document.createElement("link");
+stylesheet.rel = "stylesheet";
+stylesheet.href = "style.css";
+
+document.head.append(stylesheet);
+
+// 0. Test data
 
 const saved_tasks = localStorage.getItem("todo_tasks");
 
